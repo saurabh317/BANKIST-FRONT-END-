@@ -70,7 +70,7 @@ const displayMovements = function (movements){
   const html = `
   <div class="movements__row">
   <div class="movements__type movements__type--${type}">${i+1} ${type}</div>
-  <div class="movements__value">${mov}</div>
+  <div class="movements__value">${mov}€</div>
 </div>
 `;
 
@@ -80,6 +80,35 @@ containerMovements.insertAdjacentHTML("afterbegin",html);
  })
 } 
 displayMovements(account1.movements);
+
+// displaying total balance
+const calcdisplaybalance = function(movements){
+  const balance = movements.reduce(function(acc,mov){
+    return acc + mov;
+  },0);
+  labelBalance.textContent = `${balance}€`;
+}
+calcdisplaybalance(account1.movements);
+
+// displaying total income and outgoing balance
+const calcSummary = function(movements){
+  const income = movements.filter((mov)=>mov > 0).reduce(function(acc,curr){
+    return acc + curr;
+  },0);
+  labelSumIn.textContent = `${income}€`;
+
+  const outMoney = movements.filter(mov => mov < 0).reduce((acc,curr)=>{
+   return acc + curr;
+  },0);
+  labelSumOut.textContent = `${Math.abs(outMoney)}€`;
+
+  const interestt = movements.filter(mov => mov > 0).map(mov => mov *1.2/100).filter(mov => mov >= 1).reduce((acc,curr)=>{
+      return acc + curr;
+    },0);
+ 
+  labelSumInterest.textContent = `${interestt}€`
+}
+calcSummary(account1.movements);
 
 // computing username
 const createUsername = function(accs){
@@ -93,16 +122,7 @@ const createUsername = function(accs){
 createUsername(accounts);
 console.log(accounts)
 
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// LECTURES
-
-// const currencies = new Map([
-//   ['USD', 'United States dollar'],
-//   ['EUR', 'Euro'],
-//   ['GBP', 'Pound sterling'],
-// ]);
 
 
 
-/////////////////////////////////////////////////
+
