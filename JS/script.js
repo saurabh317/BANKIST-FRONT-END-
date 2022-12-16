@@ -79,7 +79,7 @@ containerMovements.insertAdjacentHTML("afterbegin",html);
 
  })
 } 
-displayMovements(account1.movements);
+
 
 // displaying total balance
 const calcdisplaybalance = function(movements){
@@ -88,27 +88,64 @@ const calcdisplaybalance = function(movements){
   },0);
   labelBalance.textContent = `${balance}€`;
 }
-calcdisplaybalance(account1.movements);
+
 
 // displaying total income and outgoing balance
-const calcSummary = function(movements){
-  const income = movements.filter((mov)=>mov > 0).reduce(function(acc,curr){
+const calcSummary = function(acc){
+  const income = acc.movements.filter((mov)=>mov > 0).reduce(function(acc,curr){
     return acc + curr;
   },0);
   labelSumIn.textContent = `${income}€`;
 
-  const outMoney = movements.filter(mov => mov < 0).reduce((acc,curr)=>{
+  const outMoney = acc.movements.filter(mov => mov < 0).reduce((acc,curr)=>{
    return acc + curr;
   },0);
   labelSumOut.textContent = `${Math.abs(outMoney)}€`;
 
-  const interestt = movements.filter(mov => mov > 0).map(mov => mov *1.2/100).filter(mov => mov >= 1).reduce((acc,curr)=>{
+  const interestt = acc.movements.filter(mov => mov > 0).map(mov => mov * acc.interestRate/100).filter(mov => mov >= 1).reduce((acc,curr)=>{
       return acc + curr;
     },0);
  
   labelSumInterest.textContent = `${interestt}€`
 }
-calcSummary(account1.movements);
+
+
+// event handlers--------
+
+let currentAccount;
+btnLogin.addEventListener('click',function(e){
+  e.preventDefault();
+  currentAccount = accounts.find(acc=>
+    acc.username === inputLoginUsername.value);
+    // console.log(currentAccount);
+
+    if(currentAccount?.pin === Number(inputLoginPin.value)){
+      labelWelcome.textContent = `welcome back, ${currentAccount.owner.split(" ")[0]}`;
+      containerApp.style.opacity = 100;
+      // clearing input field
+      inputLoginPin.value = " ";
+      inputLoginUsername.value = " ";
+      // inputLoginPin.blur();
+      
+    
+
+    // display movements
+    displayMovements(currentAccount.movements);
+
+
+
+    // display balance
+    calcdisplaybalance(currentAccount.movements);
+
+
+    // display summary
+    calcSummary(currentAccount);
+    }
+    
+
+
+
+});
 
 // computing username
 const createUsername = function(accs){
