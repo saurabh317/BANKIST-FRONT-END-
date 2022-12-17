@@ -62,10 +62,12 @@ const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
 
-const displayMovements = function (movements){
+const displayMovements = function (movements,sort = false){
+
+  const movs = sort ? movements.slice().sort((a,b)=> (a-b)) : movements;
   containerMovements.innerHTML = " ";
 
- movements.forEach(function(mov,i){
+ movs.forEach(function(mov,i){
   const type = mov > 0 ?  'deposit' : 'withdrawal';
   const html = `
   <div class="movements__row">
@@ -79,6 +81,7 @@ containerMovements.insertAdjacentHTML("afterbegin",html);
 
  })
 } 
+
 
 
 // displaying total balance
@@ -141,16 +144,16 @@ btnLogin.addEventListener('click',function(e){
       // inputLoginPin.blur();
       // updatig UI
       updateUI(currentAccount);
-      
-    
-
-  
+    }
+    else{
+      alert("hey!you entered wrong id or password or Account doesn't exist");
     }
 });
 // transferring amount
 
 btnTransfer.addEventListener('click',function(e){
   e.preventDefault();
+
   const amount = Number(inputTransferAmount.value);
   const receiverAcc = accounts.find((acc)=>
     acc.username == inputTransferTo.value);
@@ -162,36 +165,58 @@ btnTransfer.addEventListener('click',function(e){
         // doing the transferr
         currentAccount.movements.push(-amount);
         receiverAcc.movements.push(amount);
+        inputTransferTo.value = "";
+        inputTransferAmount.value = "";
         // updating the ui
         updateUI(currentAccount);
       }
+  
 
 })
 
 // taking loan
 btnLoan.addEventListener('click',function(e){
   e.preventDefault();
+  
+ 
   const loanAmount = Number(inputLoanAmount.value);
-  console.log("passed")
+  // console.log("passed");
   currentAccount.movements.push(loanAmount);
   updateUI(currentAccount);
   inputLoanAmount.value = '';
+  
 
+})
+//sorting transcations
+let sortedState = false;
+btnSort.addEventListener('click',function(e){
+  e.preventDefault();
+  displayMovements(currentAccount.movements,!sortedState);
+  sortedState = !sortedState;
 })
 
 // closing account--
-btnClose.addEventListener('click', function(e){
-  e.preventDefault();
-  if(inputCloseUsername.value == currentAccount.username && inputClosePin.value == currentAccount.pin){
-    alert("acc closed");
-    currentAccount.balance = 0;
-
-  }
+// let token = true;
+// btnClose.addEventListener('click', function(e){
+//   e.preventDefault();
+//   if(inputCloseUsername.value == currentAccount.username && inputClosePin.value == currentAccount.pin){
+//     token = false;
+//     alert("ARE YOU SURE");
+//     const search = accounts.splice(accounts.find((acc)=>
+//     acc.username == inputCloseUsername.value),1);
+//     labelBalance.textContent = 0;
+//     inputCloseUsername.value = '';
+//     inputClosePin.value      = '';
+//     labelSumIn.textContent = 0;
+//     labelSumOut.textContent = 0;
+//     labelSumInterest.textContent = '0.0€'
+//   }
   
   
-
-
-})
+  
+  
+  
+// })
 
 
 
