@@ -111,21 +111,42 @@ const formatMovementDate = function (date) {
   const day = `${date.getDate()}`.padStart(2, 0);
   const month = `${date.getMonth() + 1}`.padStart(2, 0);
   const year = date.getFullYear();
- const calcDisplaydates = (date1, date2) => Math.round(Math.abs(date1 - date2)/(1000*60*60*24));
-const daysPassed = calcDisplaydates(new Date(), date);
-console.log(daysPassed);
-if(daysPassed === 0) return "Today";
-if(daysPassed === 1) return "Yesterday";
-if(daysPassed <=7) return `${daysPassed} days ago`;
-else{
-
-  const day = `${date.getDate()}`.padStart(2, 0);
-  const month = `${date.getMonth() + 1}`.padStart(2, 0);
-  const year = date.getFullYear();
-  return    `${day}/${month}/${year}`;
-}
+  const calcDisplaydates = (date1, date2) =>
+    Math.round(Math.abs(date1 - date2) / (1000 * 60 * 60 * 24));
+  const daysPassed = calcDisplaydates(new Date(), date);
+  console.log(daysPassed);
+  if (daysPassed === 0) return "Today";
+  if (daysPassed === 1) return "Yesterday";
+  if (daysPassed <= 7) return `${daysPassed} days ago`;
+  else {
+    const day = `${date.getDate()}`.padStart(2, 0);
+    const month = `${date.getMonth() + 1}`.padStart(2, 0);
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
 };
 
+//setting the log out timer
+
+const logoutTimer = function () {
+  const tick = () => {
+    const min = `${Math.trunc(time / 60)}`.padStart(2, "0");
+    const sec = String(Math.trunc(time % 60)).padStart(2, "0");
+    labelTimer.textContent = `${min}:${sec}`;
+   
+    if (time == 0) {
+      clearInterval(setTime);
+      labelWelcome.textContent = `Log in to Get Started`;
+      containerApp.style.opacity = 0;
+    }
+    time--;
+  };
+  let time = 300;
+  tick(); 
+  const setTime = setInterval(tick, 1000);
+
+  return setTime;
+};
 // setting the date part--
 const now = new Date();
 const day = `${now.getDate()}`.padStart(2, 0);
@@ -147,8 +168,6 @@ const displayMovements = function (acc, sort = false) {
     const date = new Date(acc.movementsDates[i]);
 
     const displayDate = formatMovementDate(date);
-
-   
 
     const html = `
   <div class="movements__row">
@@ -209,7 +228,7 @@ const updateUI = function (acc) {
 };
 // event handlers--------
 
-let currentAccount;
+let currentAccount,setTime;
 btnLogin.addEventListener("click", function (e) {
   e.preventDefault();
   currentAccount = accounts.find(
@@ -230,6 +249,8 @@ btnLogin.addEventListener("click", function (e) {
   } else {
     alert("hey!you entered wrong id or password or Account doesn't exist");
   }
+  if(setTime) clearInterval(setTime);  
+  setTime = logoutTimer();
 });
 // transferring amount
 
@@ -260,6 +281,10 @@ btnTransfer.addEventListener("click", function (e) {
     // updating the ui
     updateUI(currentAccount);
   }
+  //reset the timer
+  clearInterval(setTime);
+  setTime = logoutTimer();
+  
 });
 
 // taking loan
@@ -267,11 +292,17 @@ btnLoan.addEventListener("click", function (e) {
   e.preventDefault();
 
   const loanAmount = Number(inputLoanAmount.value);
-  // console.log("passed");
-  currentAccount.movements.push(loanAmount);
-  currentAccount.movementsDates.push(new Date());
-  updateUI(currentAccount);
-  inputLoanAmount.value = "";
+  const loanTime = setTimeout(() => {
+    // console.log("passed");
+    currentAccount.movements.push(loanAmount);
+    currentAccount.movementsDates.push(new Date());
+    updateUI(currentAccount);
+    inputLoanAmount.value = "";
+  }, 3000);
+
+    //reset the timer
+    clearInterval(setTime);
+    setTime = logoutTimer();
 });
 //sorting transcations
 let sortedState = false;
@@ -282,23 +313,23 @@ btnSort.addEventListener("click", function (e) {
 });
 
 // closing account--
-// let token = true;
-// btnClose.addEventListener('click', function(e){
-//   e.preventDefault();
-//   if(inputCloseUsername.value == currentAccount.username && inputClosePin.value == currentAccount.pin){
-//     token = false;
-//     alert("ARE YOU SURE");
-//     const search = accounts.splice(accounts.find((acc)=>
-//     acc.username == inputCloseUsername.value),1);
-//     labelBalance.textContent = 0;
-//     inputCloseUsername.value = '';
-//     inputClosePin.value      = '';
-//     labelSumIn.textContent = 0;
-//     labelSumOut.textContent = 0;
-//     labelSumInterest.textContent = '0.0€'
-//   }
-
-// })
+let token = true;
+btnClose.addEventListener("click", function (e) {
+  e.preventDefault();
+  if (
+    inputCloseUsername.value == currentAccount.username &&
+    inputClosePin.value == currentAccount.pin
+  ) {
+    token = false;
+    alert("ARE YOU SURE");
+    const search = accounts.splice(
+      accounts.find((acc) => acc.username == inputCloseUsername.value),
+      1
+    );
+    labelWelcome.textContent = `Account Closed❌`;
+    containerApp.style.opacity = 0;
+  }
+});
 
 // computing username
 const createUsername = function (accs) {
@@ -319,5 +350,3 @@ console.log(accounts);
 // currentAccount = account1;
 // updateUI(currentAccount);
 // containerApp.style.opacity = 100;
-
-
