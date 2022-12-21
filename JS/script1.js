@@ -76,3 +76,32 @@ navLink.addEventListener('click',function(e){
   }
  
 })
+
+
+
+const tab_container = document.querySelector('.operations__tab-container');
+const tab = document.querySelectorAll('.operations__tab');
+const tab_content  = document.querySelectorAll('.operations__content');
+tab_container.addEventListener('click',function(e){
+  e.preventDefault();
+  const clicked = e.target.closest('.operations__tab');
+  //gaurd clause-
+  if(!clicked) return;
+  tab.forEach((t)=>{
+    t.classList.remove('operations__tab--active');
+  })
+  clicked.classList.add('operations__tab--active');
+
+
+  //activating content area--
+  tab_content.forEach((tc)=>{
+    tc.classList.remove('operations__content--active');
+
+  })
+  
+ document.querySelector(`.operations__content--${clicked.dataset.tab}`)
+  .classList.add('operations__content--active')
+  
+
+
+})
