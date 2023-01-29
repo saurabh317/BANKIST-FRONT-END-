@@ -124,5 +124,8 @@ const refactor = function(e){
 nav.addEventListener('mouseover',refactor.bind(0.5));
 nav.addEventListener('mouseout',refactor.bind(1));
  
+
+//implimenting the sticky navigation
+
  
 
